@@ -1,0 +1,105 @@
+<!doctype html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="assets/jkresponsivegallery.css" />
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="assets/jquery.touchSwipe.min.js"></script>
+
+<script src="assets/jkresponsivegallery.js">
+
+/**
+ * JK Responsive Gallery Script
+ * Copyright JavaScript Kit (www.javascriptkit.com)     
+ * Visit JavaScript Kit at http://www.javascriptkit.com/ for full source code       
+ */
+
+</script>
+
+<script>
+
+
+jQuery(function($){
+
+	$('#gallery1').responsivegallery()
+	
+	$('#gallery2').responsivegallery({
+		images: [
+					["images/legs.jpg", "Laying on the grass enjoying summer"],
+					["images/church.jpg", "In the distant valley"],
+					["images/sunset.jpg", "Biking into the night"]
+				] //<-- no comma after last setting	
+	})
+	
+	$('#group1 > div.rthumbnail').responsivegallery()
+
+	$('#group2 a').responsivegallery({autoclose:false})
+})
+
+</script>
+
+</head>
+
+<body>
+
+<h2>Demos</h2>
+
+<h3>Single Image:</h3>
+
+<div id="gallery1" class="rthumbnail">
+	<a href="images/birds.jpg">
+	<img border="0" src="images/birds_thumb.jpg" width="150" height="112"></a>
+	<div  class="rcaption">A pair of birds look on as the sun rises. <a href="http://www.dynamicdrive.com">A link</a></div>
+</div>
+
+<hr />
+
+<h3>Single Image with additional images defined via JavaScript</h3>
+
+<div id="gallery2" class="rthumbnail">
+	<a href="images/birds.jpg">
+	<img border="0" src="images/birds_thumb.jpg" width="150" height="112"></a>
+	<div  class="rcaption">A pair of birds look on as the sun rises. <a href="http://www.dynamicdrive.com">A link</a></div>
+</div>
+
+<hr />
+
+<h3>Group of Images</h3>
+
+<div id="group1">
+
+<div id="gallery3" class="rthumbnail">
+	<a href="images/tropical.jpg">
+	<img border="0" src="images/tropical_thumb.jpg" width="150" height="104"></a>
+	<div  class="rcaption">Dusk arrives somewhere in Paradise.</div>
+</div> 
+<div id="gallery3" class="rthumbnail">
+	<a href="images/waterdrop.jpg">
+	<img border="0" src="images/waterdrop_thumb.jpg" width="150" height="112"></a>
+	<div  class="rcaption">With a water drop begins the ripples.</div>
+</div> 
+<div id="gallery3" class="rthumbnail">
+	<a href="images/fisherman.jpg">
+	<img border="0" src="images/fisherman_thumb.jpg" width="150" height="103"></a>
+	<div  class="rcaption">The only question is- is it as cold?</div>
+</div> 
+<div id="gallery3" class="rthumbnail">
+	<a href="images/legs.jpg">
+	<img border="0" src="images/legs_thumb.jpg" width="150" height="131"></a>
+	<div  class="rcaption">Busking in the sun.</div>
+</div>
+
+</div>
+
+<h3>Text links</h3>
+
+<ul id="group2">
+	<li><a href="images/tropical.jpg" title="Dusk arrives somewhere in Paradise.">Sunset</a></li>
+	<li><a href="images/waterdrop.jpg">Waterdrop</a></li>
+	<li><a href="images/fisherman.jpg">Cold Swim</a></li>
+	<li><a href="images/legs.jpg">Sunbathing</a></li>
+</ul>
+
+</body>
+
+</html>
