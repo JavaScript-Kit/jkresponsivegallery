@@ -29,7 +29,7 @@ OR:
 	$('#gallery2').responsivegallery({
 		images:[
 			["image2.jpg", "caption 2"],
-			["youtube.url", "caption 3"],
+			["https://www.youtube.com/watch?v=fzrfrXhE-w4", "caption 3"],
 			["image4.jpg", "caption 4"]
 		] //<-- no comma after last setting
 	})
@@ -44,13 +44,27 @@ For Thumbnails with plain text captions or no caption at all, use:
 
 	<a class="thumblink" href="images/waterdrop.jpg" title="This is a plain text caption">Waterdrop</a>
 
+OR:
+
+	<a class="thumblink" href="https://www.youtube.com/watch?v=Pe0jFDPHkzo" title="Cupido - love is blind 3D animation short">Cupido - love is blind 3D animation short</a>
+
 For Thumbnails with rich HTML captions:
 
 	<div class="rthumbnail">
-	<a href="images/fisherman.jpg">
-	<img border="0" src="images/fisherman_thumb.jpg"></a>
-	<div class="rcaption">Caption text <b>HTML</b> supported!</div>
+		<a href="images/fisherman.jpg">
+		<img border="0" src="images/fisherman_thumb.jpg"></a>
+		<div class="rcaption">Caption text <b>HTML</b> supported!</div>
 	</div> 
+
+OR:
+
+	<div class="rthumbnail">
+		<a href="https://www.youtube.com/watch?v=wEKLEeY_WeQ">
+		<img src="http://img.youtube.com/vi/dSmAMSuNFvs/1.jpg" height="103" border="0" width="150"></a>
+		<div class="rcaption">Destiny - Animation Short</div>
+	</div>
+
+Call `$('.rthumbnail').jkresponsivegallery()` to group multiple thumbnails together so they form a gallery, or for a single image/ Youtube link, give the link an unique ID attribute, then call `$('#linkid').jkresponsivegallery()` on it.
 
 
 ## More info ##
