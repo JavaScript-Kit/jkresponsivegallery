@@ -59,6 +59,8 @@ div.responsivegallery{ /* style for responsive gallery UI */
 	height: 100%;
 	top: 0;
 	left: 0;
+	right: 0;
+	bottom: 0;
 	position: fixed;
 	display: none;
 	z-index: 1000;
@@ -105,6 +107,38 @@ div.responsivegallery div.figurearea{
 	z-index: 1000;
 }
 
+div.responsivegallery div.figurearea.isvideo{
+	width: 90%;
+}
+
+/* video container CSS */
+
+.jkvideocontainer *{
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	width: 100%;
+}
+
+
+.jkvideowrapper{
+	position: relative;
+	padding-bottom: 56.25%; /* 16:9 ratio. See https://css-tricks.com/NetMag/FluidWidthVideo/Article-FluidWidthVideo.php */
+	height: 0;
+}
+
+
+.jkvideowrapper iframe{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 10;
+}
+
+/* figure CSS */
+
 div.responsivegallery figure{
 	margin: 0;
 	padding: 0;
@@ -118,11 +152,20 @@ div.responsivegallery figure{
 
 div.responsivegallery figure img{
 	max-width: 100%;
+	width: 100%;
 	height: auto;
+	border: 0;
+	line-height: 0;
 	display: block;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  user-select: none; 
 }
 
-div.responsivegallery figcaption{
+/* Caption CSS */
+
+div.responsivegallery div.figurearea .thecaption{
 	text-align: left;
 	position: absolute;
 	bottom: 0;
@@ -135,7 +178,11 @@ div.responsivegallery figcaption{
   box-sizing: border-box;
 }
 
-div.responsivegallery figcaption:before{ /* caption overlay */
+div.responsivegallery div.figurearea.isvideo .thecaption{
+	position: relative;	
+}
+
+div.responsivegallery div.figurearea .thecaption:before{ /* caption overlay */
 	content: '';
 	position: absolute;
 	width: 100%;
@@ -147,13 +194,14 @@ div.responsivegallery figcaption:before{ /* caption overlay */
 	opacity: 0.8;
 }
 
-div.responsivegallery figcaption div.captioninner{
+div.responsivegallery div.figurearea .thecaption div.captioninner{
 	position: relative;
 	padding: 3px;
 	color: black;
+	overflow: hidden;
 }
 
-div.responsivegallery figcaption div.captioninner span.counter{
+div.responsivegallery div.figurearea .thecaption div.captioninner span.counter{
 	float: right;
 	font-size: 0.9em;
 	font-weight: bold;
@@ -163,10 +211,10 @@ div.responsivegallery figcaption div.captioninner span.counter{
 	background: #2D2D2D;
 	color: white;
 	border-radius: 50%;
-	width: 20px;
-	height: 20px;
-	line-height: 20px;
-	padding: 10px;
+	width: 40px;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
 	box-shadow: 0 0 3px gray;
 }
 

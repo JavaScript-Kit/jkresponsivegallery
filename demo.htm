@@ -21,10 +21,12 @@
 jQuery(function($){
 
 	$('#gallery1').responsivegallery()
+
+	$('#gallery1b').responsivegallery()
 	
 	$('#gallery2').responsivegallery({
-		images: [
-					["images/legs.jpg", "Laying on the grass enjoying summer"],
+		media: [
+					["https://www.youtube.com/watch?v=fzrfrXhE-w4", "Sam, a shy young man, finds himself in a slow-motion world"],
 					["images/church.jpg", "In the distant valley"],
 					["images/sunset.jpg", "Biking into the night"]
 				] //<-- no comma after last setting	
@@ -53,7 +55,17 @@ jQuery(function($){
 
 <hr />
 
-<h3>Single Image with additional images defined via JavaScript</h3>
+<h3>Single Youtube Video:</h3>
+
+<div id="gallery1b" class="rthumbnail">
+	<a href="https://www.youtube.com/v/Pe0jFDPHkzo">
+	<img src="http://img.youtube.com/vi/oIlIVFBBbNw/1.jpg" height="112" border="0" width="150"></a>
+	<div class="rcaption"><a href="https://youtu.be/oIlIVFBBbNw">Pigeons</a> - Cute animation cartoon</div>
+</div>
+
+<hr />
+
+<h3>Single Image with additional images and Youtube videos defined via JavaScript</h3>
 
 <div id="gallery2" class="rthumbnail">
 	<a href="images/birds.jpg">
@@ -63,40 +75,45 @@ jQuery(function($){
 
 <hr />
 
-<h3>Group of Images</h3>
+<h3>Group of Images and Youtube videos</h3>
 
 <div id="group1">
 
-<div id="gallery3" class="rthumbnail">
-	<a href="images/tropical.jpg">
-	<img border="0" src="images/tropical_thumb.jpg" width="150" height="104"></a>
-	<div  class="rcaption">Dusk arrives somewhere in Paradise.</div>
-</div> 
-<div id="gallery3" class="rthumbnail">
-	<a href="images/waterdrop.jpg">
-	<img border="0" src="images/waterdrop_thumb.jpg" width="150" height="112"></a>
-	<div  class="rcaption">With a water drop begins the ripples.</div>
-</div> 
-<div id="gallery3" class="rthumbnail">
-	<a href="images/fisherman.jpg">
-	<img border="0" src="images/fisherman_thumb.jpg" width="150" height="103"></a>
-	<div  class="rcaption">The only question is- is it as cold?</div>
-</div> 
-<div id="gallery3" class="rthumbnail">
-	<a href="images/legs.jpg">
-	<img border="0" src="images/legs_thumb.jpg" width="150" height="131"></a>
-	<div  class="rcaption">Busking in the sun.</div>
-</div>
+	<div class="rthumbnail">
+		<a href="https://www.youtube.com/watch?v=Pe0jFDPHkzo">
+		<img src="http://img.youtube.com/vi/Pe0jFDPHkzo/1.jpg" height="104" border="0" width="150"></a>
+		<div class="rcaption"><a href="https://www.youtube.com/watch?v=Pe0jFDPHkzo">Cupido</a> - love is blind 3d animation short film</div>
+	</div> 
+	
+	<div class="rthumbnail">
+		<a href="images/waterdrop.jpg">
+		<img src="images/waterdrop_thumb.jpg" height="112" border="0" width="150"></a>
+		<div class="rcaption">With a water drop begins the ripples.</div>
+	</div> 
+	
+	<div class="rthumbnail">
+		<a href="https://www.youtube.com/watch?v=wEKLEeY_WeQ">
+		<img src="http://img.youtube.com/vi/dSmAMSuNFvs/1.jpg" height="103" border="0" width="150"></a>
+		<div class="rcaption">Destiny - Animation Short</div>
+	</div> 
+	
+	<div class="rthumbnail">
+		<a href="images/legs.jpg">
+		<img src="images/legs_thumb.jpg" height="131" border="0" width="150"></a>
+		<div class="rcaption">Busking in the sun.</div>
+	</div>
 
 </div>
 
 <h3>Text links</h3>
 
 <ul id="group2">
-	<li><a href="images/tropical.jpg" title="Dusk arrives somewhere in Paradise.">Sunset</a></li>
+
+	<li><a href="https://www.youtube.com/watch?v=Pe0jFDPHkzo" title="Cupido - love is blind 3D animation short">Cupido - love is blind 3D animation short</a></li>
 	<li><a href="images/waterdrop.jpg">Waterdrop</a></li>
-	<li><a href="images/fisherman.jpg">Cold Swim</a></li>
+	<li><a href="https://www.youtube.com/watch?v=wEKLEeY_WeQ">Destiny- animated short</a></li>
 	<li><a href="images/legs.jpg">Sunbathing</a></li>
+
 </ul>
 
 </body>

@@ -2,23 +2,43 @@
  * JK Responsive Gallery Script
  * Copyright JavaScript Kit (www.javascriptkit.com)
  * Updated: Aug 26th, 15'
+ * Updated March 14thm 16' to V2.0: Adds Youtube videos support, bug fixes
  * Visit JavaScript Kit at http://www.javascriptkit.com/ for full source code       
  */
 
+var jkyoutubeapidfd = $.Deferred()
+
+function onYouTubeIframeAPIReady(){
+	jkyoutubeapidfd.resolve()
+}
+
 (function($){
+
 
 	document.createElement('figure') // for lesser IEs sake
 	document.createElement('figcaption') // for lesser IEs sake
 
+  var tag = document.createElement('script')
+  tag.src = "https://www.youtube.com/iframe_api"
+  var firstScriptTag = document.getElementsByTagName('script')[0]
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+
+	var youtubeplayer = null
+	var videoaspectratio = 1.77 // 16:9 aspect ratio for video
+	var isYoutubeReg = /(youtube?\.com|youtu\.be)/i
+	// RegExp from: https://github.com/jsor/lity/blob/master/src/lity.js
+	var youTubeIdReg = /(youtube?\.com|youtu\.be)\/(watch\?v=|v\/|u\/|embed\/?)?([\w-]{11})(.*)?/i
 	var captionclass = 'rcaption'
 
 	var KEYCODE_ESC = 27
 			KEYCODE_LEFT = 37
 			KEYCODE_RIGHT = 39
 
+	var updatedimensionstimer = null
+
 	var defaults = {
 		autoclose: true,
-		images: [], // leave this intact
+		media: [], // leave this intact
 		fxduration: 150
 	}
 
@@ -32,25 +52,45 @@
 								+ '</div>' // end galleryinner
 								+ '</div>'
 
-	function buildfigure(imagefigure, curimage, totalimages){
-		var countermarkup = (totalimages>1)? '<span class="counter">' + (curimage+1) + '/' + totalimages + '</span>' : ''
+
+	function buildfigure(mediafigure, curmedia, totalmedia){
+		var countermarkup = (totalmedia>1)? '<span class="counter">' + (curmedia+1) + '/' + totalmedia + '</span>' : ''
 		var figurehtml = '<figure>\n'
-		figurehtml += '<img src="' + imagefigure[0] + '" />\n'
-		figurehtml += '<figcaption><div class="captioninner">' + countermarkup + (imagefigure[1] || "") + '</div></figcaption>\n'
+		figurehtml += '<img src="' + mediafigure[0] + '" />\n'
+		if (mediafigure[1] || totalmedia > 1){
+			figurehtml += '<figcaption class="thecaption"><div class="captioninner">' + countermarkup + (mediafigure[1] || "") + '</div></figcaption>\n'
+		}
 		figurehtml += '</figure>'
 		return figurehtml
 	}
 
-	function preloadimage(imageurl, callback){
+	function buildvideocontainer(mediafigure, curmedia, totalmedia){
+		var countermarkup = (totalmedia>1)? '<span class="counter">' + (curmedia+1) + '/' + totalmedia + '</span>' : ''
+		var videohtml = '<div class="jkvideocontainer">\n'
+		videohtml += '<div class="jkvideowrapper"><div id="jkvideotemp"></div></div>\n'
+		if (mediafigure[1] || totalmedia > 1){
+			videohtml += '<div class="thecaption"><div class="captioninner">' + countermarkup + (mediafigure[1] || "") + '</div></div>\n'
+		}
+		videohtml += '</div>'
+		return videohtml
+	}
+
+	function preloadmedia(mediaurl, callback){
 		var callback = callback || function(){}
-		var preload = new Image()
-		preload.onload = function(){
+
+		if (!isYoutubeReg.test(mediaurl)){ // if image?
+			var preload = new Image()
+			preload.onload = function(){
+				callback()
+			}
+			preload.onerror = function(){
+				callback('error')
+			}
+			preload.src= mediaurl
+		}
+		else{ // if youtube video
 			callback()
 		}
-		preload.onerror = function(){
-			callback('error')
-		}
-		preload.src= imageurl
 	}
 
 	var responsivegallery = {
@@ -61,7 +101,7 @@
 		$errordiv: null,
 		$galleryfigurearea: null,
 		activesettings: null,
-		activegallery: {images:[], curimage:0, imagesshown:[], startingimage:null},
+		activegallery: {media:[], curmedia:0, mediashown:[], startingmedia:null},
 		
 		buildgalleryui: function(){
 			this.$galleryui = $(galleryui).appendTo(document.body)
@@ -77,9 +117,9 @@
 				if (responsivegallery.$galleryui.css('display') == 'block'){
 					if (e.keyCode == KEYCODE_ESC)
 						responsivegallery.hidegallery()
-					else if (e.keyCode == KEYCODE_LEFT && responsivegallery.activegallery.images.length > 1)
+					else if (e.keyCode == KEYCODE_LEFT && responsivegallery.activegallery.media.length > 1)
 						responsivegallery.navigate('prev')
-					else if (e.keyCode == KEYCODE_RIGHT && responsivegallery.activegallery.images.length > 1)
+					else if (e.keyCode == KEYCODE_RIGHT && responsivegallery.activegallery.media.length > 1)
 						responsivegallery.navigate('next')
 				}
 			})
@@ -102,9 +142,22 @@
 				e.stopPropagation()
 			})
 
-			$(window).on('resize.adjustimageheight', function(){
+			$(window).on('resize.adjustuidimensions', function(){
 				if (responsivegallery.$galleryui.css('display') == 'block'){
-					responsivegallery.$galleryfigurearea.find('img:eq(0)').css('maxHeight', responsivegallery.$galleryinner.height()-30)
+					if (responsivegallery.$galleryfigurearea.hasClass('isvideo')){
+						var captionheight = responsivegallery.$galleryinner.find('div.thecaption').height() || 0
+						var maxheight = responsivegallery.$galleryinner.height() - captionheight
+						var maxwidth = maxheight * videoaspectratio - 30
+						if (maxwidth > 1000){ // if video width is past 1000, create some left/right margin inside window
+							maxwidth -= 100
+						}
+						responsivegallery.$galleryfigurearea.css({width: maxwidth})
+					}
+					else{
+						var $galleryimg = responsivegallery.$galleryfigurearea.find('img:eq(0)')
+						$galleryimg.css('maxHeight', responsivegallery.$galleryinner.height()-10)
+						responsivegallery.$galleryfigurearea.css({width: 'auto'})
+					}
 				}
 			})
 
@@ -129,39 +182,71 @@
 
 		},
 
+		destroyvideoplayer: function(){
+			if (youtubeplayer != null){
+				youtubeplayer.destroy()
+				youtubeplayer = null
+			}
+		},
+
 		showgallery: function(){
 			var $navbuttons = this.$galleryui.find('div.leftnav, div.rightnav')
-			$navbuttons.css('display', (this.activegallery.images.length > 1)? 'block' : 'none')
+			$navbuttons.css('display', (this.activegallery.media.length > 1)? 'block' : 'none')
 			this.$galleryui.fadeIn(this.activesettings.fxduration)
 		},
 
 		hidegallery:function(){
+			this.destroyvideoplayer()
 			this.$galleryfigurearea.empty()
 			this.$galleryui.fadeOut(this.activesettings.fxduration)
 		},
 
 		populategallery: function(){
-			var images = this.activegallery.images
-			var curimage = this.activegallery.curimage
-			var targetfigure = images[curimage]
+			var media = this.activegallery.media
+			var curmedia = this.activegallery.curmedia
+			var targetfigure = media[curmedia]
 			clearTimeout( this.loadingdivtimer )
+			this.destroyvideoplayer()
 			this.loadingdivtimer = setTimeout(function(){
 				responsivegallery.$loadingdiv.css('display', 'block')
 			}, 50)
 			this.$errordiv.css('display', 'none')
-			preloadimage(images[curimage][0], function(err){
-				clearTimeout( responsivegallery.loadingdivtimer )
-				responsivegallery.$loadingdiv.css('display', 'none')
+			preloadmedia(media[curmedia][0], function(err){
 				if (err){
+					clearTimeout( responsivegallery.loadingdivtimer )
+					responsivegallery.$loadingdiv.css('display', 'none')
 					responsivegallery.$galleryfigurearea.empty()
-					responsivegallery.$errordiv.css('display', 'block').attr('title', 'Error loading ' + images[curimage][0])
-					var $galleryimage = responsivegallery.$galleryfigurearea.find('img:eq(0)')
+					responsivegallery.$errordiv.css('display', 'block').attr('title', 'Error loading ' + media[curmedia][0])
+					var $gallerymedia = responsivegallery.$galleryfigurearea.find('img:eq(0)')
 					var $figcaptioninner = responsivegallery.$galleryfigurearea.find('figcaption div.captioninner')
 				}
-				else{				
-					responsivegallery.$galleryfigurearea.empty().html( buildfigure(images[curimage], curimage, images.length) )
+				else{ //  load either media or Youtube video
+					var isvideo = isYoutubeReg.test(media[curmedia][0])
+					if (isvideo){
+						responsivegallery.$galleryfigurearea.addClass('isvideo')
+						responsivegallery.$galleryfigurearea.empty().html( buildvideocontainer(media[curmedia], curmedia, media.length) )
+						jkyoutubeapidfd.then(function(){
+							youtubeplayer = new YT.Player('jkvideotemp', {
+								videoId: youTubeIdReg.exec(media[curmedia][0])[3],
+								playerVars: { 'autoplay': 1 },
+						    events: {
+						      'onReady': function(e){
+										clearTimeout( responsivegallery.loadingdivtimer )
+										responsivegallery.$loadingdiv.css('display', 'none')
+									}
+								}
+							})
+						})
+					}
+					else{
+						clearTimeout( responsivegallery.loadingdivtimer )
+						responsivegallery.$loadingdiv.css('display', 'none')
+						responsivegallery.$galleryfigurearea.removeClass('isvideo')
+						responsivegallery.$galleryfigurearea.empty().html( buildfigure(media[curmedia], curmedia, media.length) )
+					}
 				}
-				$(window).trigger('resize.adjustimageheight')
+				responsivegallery.$galleryui.css('display', 'block')
+				$(window).trigger('resize.adjustuidimensions')
 				responsivegallery.$galleryfigurearea.find('figure').css({transitionDuration: (responsivegallery.activesettings.fxduration/1000) + 's', opacity:1})
 			})
 			
@@ -169,27 +254,27 @@
 		},
 
 		navigate: function(keyword){
-			var images = this.activegallery.images
-			var curimage = this.activegallery.curimage
-			var startingimage = this.activegallery.startingimage
-			var imagesshown = this.activegallery.imagesshown
+			var media = this.activegallery.media
+			var curmedia = this.activegallery.curmedia
+			var startingmedia = this.activegallery.startingmedia
+			var mediashown = this.activegallery.mediashown
 
-			var targetimage = (keyword == 'next')? ( (curimage < images.length-1)? curimage+1 : 0) :
-												(keyword == 'prev')? ( (curimage > 0)? curimage-1 : images.length-1) :
+			var targetmedia = (keyword == 'next')? ( (curmedia < media.length-1)? curmedia+1 : 0) :
+												(keyword == 'prev')? ( (curmedia > 0)? curmedia-1 : media.length-1) :
 												parseInt(keyword)
 
-			if (this.activesettings.autoclose && imagesshown[imagesshown.length-1] == 'all' && targetimage == startingimage){
+			if (this.activesettings.autoclose && mediashown[mediashown.length-1] == 'all' && targetmedia == startingmedia){
 				this.hidegallery()
 				return
 			}
 
-			if (jQuery.inArray(targetimage, imagesshown) == -1){
-				imagesshown.push(targetimage)
+			if (jQuery.inArray(targetmedia, mediashown) == -1){
+				mediashown.push(targetmedia)
 			}
-			this.activegallery.curimage = targetimage
+			this.activegallery.curmedia = targetmedia
 			this.populategallery()
-			if (images.length > 1 && imagesshown.length >= images.length && this.activesettings.autoclose){
-				imagesshown.push('all')
+			if (media.length > 1 && mediashown.length >= media.length && this.activesettings.autoclose){
+				mediashown.push('all')
 			}
 		}
 
@@ -197,24 +282,24 @@
 
 	$.fn.responsivegallery = function(settings){
 		var matches = this.length
-		var images = []
+		var media = []
 		return this.each(function(i){
 			var s = $.extend({}, defaults, settings)
 			var $t = $(this)
-			var enlargedimage
+			var enlargedmedia
 			var $galleryui = $('div.responsivegallery')
 			$t.data('pos', i)
-			var enlargeimagesrc = $t.is('a')? $t.attr('href') : $t.find('a:eq(0)').attr('href')
+			var enlargemediarc = $t.is('a')? $t.attr('href') : $t.find('a:eq(0)').attr('href')
 			var caption = ($t.find('div.' + captionclass).length == 1)? $t.find('div.' + captionclass).html() : $t.attr('title')
-			enlargedimage = [enlargeimagesrc, caption]
-			images.push( enlargedimage ) // add enlargeimage to own collection of images[]
+			enlargedmedia = [enlargemediarc, caption]
+			media.push( enlargedmedia ) // add enlargemedia to own collection of media[]
 			if (matches == 1){ // if only one thumbnail in collection
-				images = images.concat(s.images) // add enlargeimage as 1st element in s.images
+				media = media.concat(s.media) // add enlargemedia as 1st element in s.media
 			}
 			$t.on('click', function(e){
 				e.preventDefault()
 				responsivegallery.activesettings = s
-				responsivegallery.activegallery = {images: images, curimage: $(this).data('pos'), imagesshown: [$(this).data('pos')], startingimage: $(this).data('pos')}
+				responsivegallery.activegallery = {media: media, curmedia: $(this).data('pos'), mediashown: [$(this).data('pos')], startingmedia: $(this).data('pos')}
 				responsivegallery.populategallery()
 				responsivegallery.showgallery()
 
