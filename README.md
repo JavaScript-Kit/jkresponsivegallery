@@ -1,4 +1,4 @@
-# JK Responsive Gallery #
+# JK Responsive Youtube Video and Image Gallery #
 
 *Description:* JK Responsive Gallery is a modern, lightbox style image and Youtube gallery that works perfectly on any screen size and device, big or small. Key features:
 
